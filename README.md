@@ -51,9 +51,9 @@ Download the ImageNet dataset from the following Kaggle link:
 Run TtBA using the following command structure. Specify the dataset and other parameters such as epsilon, the number of images, and budget.
 
 ```bash
-python3 TtBA.py --dataset=mnist --epsilon=0.15 --imgnum=1000 --budget=10000
-python3 TtBA.py --dataset=cifar --epsilon=0.031 --imgnum=1000 --budget=10000
-python3 TtBA.py --dataset=vgg --epsilon=0.05 --imgnum=1000 --budget=10000
+python3 main.py --dataset=mnist --epsilon=0.15 --imgnum=1000 --budget=10000
+python3 main.py --dataset=cifar --epsilon=0.031 --imgnum=1000 --budget=10000
+python3 main.py --dataset=vgg --epsilon=0.05 --imgnum=1000 --budget=10000
 ```
 
 ---
