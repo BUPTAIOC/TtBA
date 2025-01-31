@@ -184,78 +184,7 @@ class Attacker():
             torch.cat([self.x0, self.x0 + (boundary_vl2[1]) * attempt_unit_v]), self.tol)
         sim_cos = DataTools.cosine_similarity(best_boundary_x - self.x0, boundary_x - self.x0)
         return best_boundary_x, real_L2s, (num_q + q_bin), k, L
-        """
-        Left, Right = 0, R
-        attempt_k = [Left * GOLD + Right * (1 - GOLD),
-                     Left * (1 - GOLD) + Right * GOLD]
-        attempt_unit_v = [self.get_attempt_unit_v(boundary_x, boundary_vl2, normal_v, attempt_k[0]),
-                          self.get_attempt_unit_v(boundary_x, boundary_vl2, normal_v, attempt_k[1])]
-        L2s = [copy.deepcopy(basic_l2),
-               copy.deepcopy(basic_l2)]
-        Xs = [self.x0, self.x0 + boundary_vl2[1] * attempt_unit_v[1]]
-        chosen_ki = 1
-        while abs(attempt_k[1] - attempt_k[0]) > 0.03:
-            chosen_ki, q_plus, L2s, Xs = self.compare_attempts_fast(self.x0, attempt_unit_v, L2s, chosen_ki,
-                                                                    boundary_vl2)
-            num_q += q_plus
-            if chosen_ki == 0:
-                Left, Right = Left, attempt_k[1]
-                L2s[0], L2s[1] = copy.deepcopy(basic_l2), L2s[0]
-            elif chosen_ki == 1:
-                Left, Right = attempt_k[0], Right
-                L2s[0], L2s[1] = L2s[1], copy.deepcopy(basic_l2)
-            attempt_k = [Left * GOLD + Right * (1 - GOLD), Left * (1 - GOLD) + Right * GOLD]
-            attempt_unit_v[0] = self.get_attempt_unit_v(boundary_x, boundary_vl2, normal_v, attempt_k[0])
-            attempt_unit_v[1] = self.get_attempt_unit_v(boundary_x, boundary_vl2, normal_v, attempt_k[1])
-            chosen_ki = not chosen_ki
-        
-        best_boundary_x, real_L2s, q_bin = self.bin_search_fast(torch.cat(Xs))
-        sim_cos = DataTools.cosine_similarity(best_boundary_x - self.x0, boundary_x - self.x0)
-        return best_boundary_x, real_L2s, (num_q + q_bin), attempt_k[chosen_ki], sim_cos
-        """
 
-    def compare_attempts_fast(self, x0, attempt_unit_v, L2s, chosen_ki, boundary_v_l2):
-        q_plus = 1
-        adv_x = [[x0 + attempt_unit_v[0] * (L2s[0][0]),
-                  x0 + attempt_unit_v[0] * (L2s[0][1])],
-                 [x0 + attempt_unit_v[1] * (L2s[1][0]),
-                  x0 + attempt_unit_v[1] * (L2s[1][1])]]
-
-        adv1 = attempt_unit_v[not chosen_ki] * L2s[chosen_ki][1] + x0
-        if self.is_adversarial(adv1) == -1:
-            L2s[not chosen_ki][0], L2s[not chosen_ki][1] = L2s[chosen_ki][1], 999
-            return chosen_ki, q_plus, L2s, adv_x[chosen_ki]
-        elif L2s[chosen_ki][0] > 0:
-            q_plus += 1
-            if self.is_adversarial(attempt_unit_v[not chosen_ki] * L2s[chosen_ki][0] + x0) == 1:
-                L2s[not chosen_ki][0], L2s[not chosen_ki][1] = 0, L2s[chosen_ki][0]
-                return (not chosen_ki), q_plus, L2s, adv_x[not chosen_ki]
-
-        new_chosen = 1
-        low, high, mid = copy.deepcopy(L2s[chosen_ki][0]), copy.deepcopy(L2s[chosen_ki][1]), 0
-        while abs(high - low) > self.tol:
-            mid = (high + low) / 2  # DataTools.next_binary_rref(low, high, boundary_v_l2[1], 0)
-            adv_mid_x = [sum(adv_x[0]) / 2, sum(adv_x[1]) / 2]
-            adv_mid_l2 = [torch.norm(adv_mid_x[0] - x0), torch.norm(adv_mid_x[1] - x0)]
-            success = [self.is_adversarial(adv_mid_x[0]), self.is_adversarial(adv_mid_x[1])]
-            q_plus += 2
-            if success[0] == 1 and success[1] == 1:
-                high, L2s[0][1], L2s[1][1], adv_x[0][1], adv_x[1][1] = mid, adv_mid_l2[0], adv_mid_l2[1], adv_mid_x[0], \
-                adv_mid_x[1]
-            elif success[0] == -1 and success[1] == -1:
-                low, L2s[0][0], L2s[1][0], adv_x[0][0], adv_x[1][0] = mid, adv_mid_l2[0], adv_mid_l2[1], adv_mid_x[0], \
-                adv_mid_x[1]
-            elif success[0] == 1 and success[1] == -1:
-                L2s[0][1], L2s[1][0], adv_x[0][1], adv_x[1][0] = adv_mid_l2[0], adv_mid_l2[1], adv_mid_x[0], adv_mid_x[
-                    1]
-                new_chosen = 0
-                break
-            elif success[0] == -1 and success[1] == 1:
-                L2s[0][0], L2s[1][1], adv_x[0][0], adv_x[1][1] = adv_mid_l2[0], adv_mid_l2[1], adv_mid_x[0], adv_mid_x[
-                    1]
-                new_chosen = 1
-                break
-        return new_chosen, q_plus, L2s, adv_x[new_chosen]
 
     def attack(self):
         if self.tar_img != None:

@@ -14,7 +14,7 @@ def save_and_resize_image(image_tensor, file_path):
     utils.save_image(image_tensor, file_path)
     img = Image.open(file_path)
     img = img.resize((224, 224), Image.NEAREST)
-    img.save(file_path, format='BMP')  # 保存为位图格式
+    img.save(file_path, format='BMP')
 
 
 def concatenate_images(image_paths):
@@ -71,64 +71,22 @@ def RlineQ(Rline, radius_line, budget):
     return
 
 def draw_distribution(x, name="pic"):
-    # 绘制直方图
     plt.figure(figsize=(10, 8))
     counts, bins, patches = plt.hist(x, bins=50, color='skyblue', edgecolor='black', weights=np.ones(len(x)) / len(x))
-    # 转换为百分比显示
     #for i in range(len(patches)):
     #    plt.text(bins[i] + (bins[1] - bins[0]) / 2, counts[i] + 0.001, f"{counts[i] * 100:.1f}%", ha='center')
     plt.xlim(0, 1)
     plt.xticks(np.arange(0.1, 1.1, 0.1), fontsize=30)
     plt.tick_params(axis='both', which='major', labelsize=30)
-    # 设置 y 轴为百分比
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y * 100:.0f}%"))
-    # 添加标题和标签
     #plt.title("Histogram with Percentage", fontsize=14)
     #plt.xlabel("Value", fontsize=12)
     #plt.ylabel("Frequency (Percentage)", fontsize=12)
-    # 显示图形
     plt.tight_layout()
     plt.show()
 
 
 ##################################################################################
-# 给定参数 cifar10/Imagenet
-
-a_hat = 0.03133292769944518
-b_hat = 3.0659694403842903
-c_hat = 0.16755646970211466
-d_hat = 0.13403850261898806
-
-
-# 定义函数 y
-def func_y(r, a, b, c, d):
-    return a / ((r + d) ** b) + c
-
-
-# 为了使用 fsolve，需要定义一个差函数
-def find_midK_of_k1k2(k1, k2):
-    Sk1k2, error = quad(func_y, k1, k2, args=(a_hat, b_hat, c_hat, d_hat))
-    low, high = k1, k2
-    mid = (low + high) / 2
-    Sk1mid = None
-    while high - low > 1.0 / 10000:
-        mid = (low + high) / 2
-        Sk1mid, error = quad(func_y, k1, mid, args=(a_hat, b_hat, c_hat, d_hat))
-        if Sk1mid < Sk1k2 / 2:
-            low = mid
-        else:
-            high = mid
-    return mid
-
-
-def next_binary_rref(r1, r2, max_r, mod):
-    if mod == 0:
-        return (r1 + r2) / 2.0
-    if mod == 1:
-        k1, k2 = r1 / max_r, r2 / max_r
-        kmid = find_midK_of_k1k2(1-k2, 1-k1)
-        median = (1-kmid) * max_r
-        return median
 
 def cosine_similarity(tensor1, tensor2):
     dot_product = torch.dot(tensor1.flatten(), tensor2.flatten())
