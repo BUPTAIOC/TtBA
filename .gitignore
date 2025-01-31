@@ -137,15 +137,17 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-/code/data/
+/data/
 /data/imagenet/
-/code/adversarial_samples/
-/code/results_record/
-/code/model/resnet50-11ad3fa6.pth
-/code/model/
+/adversarial_samples/
+/results_record/
+/model/resnet50-11ad3fa6.pth
+/model/
 /.vs
 /.idea/deployment.xml
 /.idea/sshConfigs.xml
 /.idea/webServers.xml
 /.idea/other.xml
 /.idea/
+.idea/
+.vs/
